@@ -11,7 +11,7 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 # app.config['WTF_CSRF_ENABLED'] = False
 debug = DebugToolbarExtension(app)
 
-headers = {"Authorization": "Bearer BQAVOoOPYkKnPy2nd2maqCjGq4yyPZiEjCuti0XVUYsccKBDcr-KKw7eNNYkCwCSm6dsVr9_Rsbc1603TKWjWeePC9rrnVLUefU_ql3R6xAPFBbrUD7FF_MpGlIKRQVoWZfNkqUqIUuRhNp5c9PvUDexxvoptbHwHnYHXupBgAIerw4"}
+headers = {"Authorization": "Bearer BQD6_CN9FaETfJPTSrBbrwrBKk36P1bQESuwqwigDTqy8EEz6897rgBWFE5_YnvzPOhM9CnvZQ1ueJZP6QTtwsD4TPDjGfjLiKhx--oANoK7WrME6di5qLXXHZWZ-bv4slvGdKmQ1msCKBXro9-r2WJo1yHQ5oNxO1-Lx8l4KD8IGV4"}
 
 @app.route('/')
 def homepage():
@@ -24,7 +24,7 @@ def homepage():
 
   json = res.json()
 
-  # print(json)
+  # print(json['error'])
 
   tracks = json['tracks']['items']
 
@@ -46,8 +46,9 @@ def homepage():
       urls.append(url)
 
   src = urls[0]
+
   src_id = src[-22:]
 
-  flash(f'You chose a {genre} song that is {minutes} minutes long. Press play to start steeping!')
+  flash(f'You chose a {genre} song that is ~{minutes} minutes long. Press play to start steeping!')
 
   return render_template('index.html', src_id=src_id)
