@@ -1,12 +1,13 @@
 {% extends 'base.html' %} {% block content %}
-<nav class="navbar bg-light">Steepr Test</nav>
+<nav class="navbar bg-light"><a href="/">Steepr Test</a></nav>
 <div class="container">
   <br />
-  <form>
+  <form class="form-group">
     <label for="genre">Genre:</label>
-    <input type="text" name="genre" placeholder="Folk" />
+    <input class="form-control" type="text" name="genre" placeholder="Folk" />
     <label for="minutes">Minutes:</label>
-    <input type="text" name="minutes" placeholder="4" />
+    <input class="form-control" type="text" name="minutes" placeholder="4" />
+    <br />
     <button type="submit">Submit</button>
   </form>
   <br />
@@ -24,6 +25,5 @@
     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
     loading="lazy"
   ></iframe>
-  <p>{{src}}</p>
 </div>
 {% endblock %}

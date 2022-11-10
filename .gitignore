@@ -1,5 +1,8 @@
 .DS_Store
 venv/
+venv/lib
+status_codes.py
 __pycache__
 **/.vscode/
 .env
+auth.py

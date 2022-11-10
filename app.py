@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect, flash, jsonify
 from random import randint, choice, sample
 from flask_debugtoolbar import DebugToolbarExtension
+from auth import authentication
 import requests
 app = Flask(__name__)
 app.app_context().push()
@@ -11,7 +12,7 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 # app.config['WTF_CSRF_ENABLED'] = False
 debug = DebugToolbarExtension(app)
 
-headers = {"Authorization": "Bearer BQD6_CN9FaETfJPTSrBbrwrBKk36P1bQESuwqwigDTqy8EEz6897rgBWFE5_YnvzPOhM9CnvZQ1ueJZP6QTtwsD4TPDjGfjLiKhx--oANoK7WrME6di5qLXXHZWZ-bv4slvGdKmQ1msCKBXro9-r2WJo1yHQ5oNxO1-Lx8l4KD8IGV4"}
+headers = authentication
 
 @app.route('/')
 def homepage():
@@ -24,18 +25,19 @@ def homepage():
 
   json = res.json()
 
-  # print(json['error'])
+  if 'error' in json:
+    print(json['error'])
 
   tracks = json['tracks']['items']
 
-  urls = []
+  ids = []
 
   for item in tracks:
     name = item['name']
 
     artist = item['artists'][0]['name']
 
-    url = item['external_urls']['spotify']
+    id = item['id']
 
     duration = item['duration_ms']
 
@@ -43,11 +45,10 @@ def homepage():
 
     if rounded_duration >= (minutes-0.2) and rounded_duration <= (minutes+0.2):
       # print(f"'{name}' by {artist} is {rounded_duration} minutes, which is about {minutes} minutes. The URL is {url}.")
-      urls.append(url)
+      ids.append(id)
 
-  src = urls[0]
-
-  src_id = src[-22:]
+  src_id = choice(ids)
+  # print(src_id)
 
   flash(f'You chose a {genre} song that is ~{minutes} minutes long. Press play to start steeping!')
 
