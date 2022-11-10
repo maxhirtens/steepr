@@ -16,8 +16,6 @@ headers = {"Authorization": "Bearer BQAVOoOPYkKnPy2nd2maqCjGq4yyPZiEjCuti0XVUYsc
 @app.route('/')
 def homepage():
   '''Show user form and embedded player.'''
-  # minutes = 3
-  # genre = 'folk'
 
   minutes = int(request.args.get('minutes', 4))
   genre = request.args.get('genre', 'folk')
@@ -49,5 +47,7 @@ def homepage():
 
   src = urls[0]
   src_id = src[-22:]
+
+  flash(f'You chose a {genre} song that is {minutes} minutes long. Press play to start steeping!')
 
   return render_template('index.html', src_id=src_id)

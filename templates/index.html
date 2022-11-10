@@ -3,11 +3,16 @@
 <div class="container">
   <form>
     <label for="genre">Genre:</label>
-    <input type="text" name="genre" />
+    <input type="text" name="genre" placeholder="Folk" />
     <label for="minutes">Minutes:</label>
-    <input type="text" name="minutes" />
+    <input type="text" name="minutes" placeholder="4" />
     <button type="submit">Submit</button>
   </form>
+  <br />
+  {% for msg in get_flashed_messages() %}
+  <div class="alert alert-info">{{msg}}</div>
+  <br />
+  {% endfor %}
   <iframe
     style="border-radius: 12px"
     src="https://open.spotify.com/embed/track/{{src_id}}?utm_source=generator"
