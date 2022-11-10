@@ -1,0 +1,23 @@
+{% extends 'base.html' %} {% block content %}
+<h1>Steepr Test</h1>
+<div class="container">
+  <form>
+    <label for="genre">Genre:</label>
+    <input type="text" name="genre" />
+    <label for="minutes">Minutes:</label>
+    <input type="text" name="minutes" />
+    <button type="submit">Submit</button>
+  </form>
+  <iframe
+    style="border-radius: 12px"
+    src="https://open.spotify.com/embed/track/{{src_id}}?utm_source=generator"
+    width="100%"
+    height="352"
+    frameborder="0"
+    allowfullscreen=""
+    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+    loading="lazy"
+  ></iframe>
+  <p>{{src}}</p>
+</div>
+{% endblock %}
