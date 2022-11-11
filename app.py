@@ -44,7 +44,7 @@ def homepage():
     rounded_duration = round((duration/60000), 2)
 
     if rounded_duration >= (minutes-0.2) and rounded_duration <= (minutes+0.2):
-      # print(f"'{name}' by {artist} is {rounded_duration} minutes, which is about {minutes} minutes. The URL is {url}.")
+      # print(f"'{name}' by {artist} is {rounded_duration} minutes, which is about {minutes} minutes. The id is {id}.")
       ids.append(id)
 
   src_id = choice(ids)
