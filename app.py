@@ -1,11 +1,11 @@
 from flask import Flask, request, render_template, redirect, flash, jsonify
 from random import randint, choice, sample
 from flask_debugtoolbar import DebugToolbarExtension
-from auth import authentication
 import requests
 from pprint import pprint
 from spotipy.oauth2 import SpotifyClientCredentials
 import spotipy
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 app.app_context().push()
@@ -15,6 +15,8 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.config['WTF_CSRF_ENABLED'] = False
 debug = DebugToolbarExtension(app)
+
+load_dotenv()
 
 # **** V1 using hardcoded Bearer token :( *******
 
