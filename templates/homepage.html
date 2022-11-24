@@ -1,0 +1,39 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container">
+  <br />
+
+  <div class="row justify-content-md-center">
+    <div class="col-md-4">
+      <h2 class="join-message">Create Your Steep.</h2>
+      <small
+        ><a href="https://accounts.spotify.com/en/login" target="_blank"
+          >Not logged in to Spotify? Click here.</a
+        ></small
+      >
+      <br />
+      <form method="POST" id="user_form">
+        {{ form.hidden_tag() }} {% for field in form if field.widget.input_type
+        != 'hidden' and field.name != 'password' %} {% for error in
+        field.errors%}
+        <span class="text-danger">{{ error }}</span>
+        {% endfor %} {{ field(placeholder=field.label.text,
+        class_="form-control") }} <br />{% endfor %}
+
+        <div class="edit-btn-area">
+          <button class="btn btn-success">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <br />
+  <div class="col-xs-1 text-center">
+    <h3>Recent Steeps</h3>
+    <ul style="list-style: none" class="text-center">
+      {% for steep in steeps %}
+      <li><a href="">{{steep.name}}</a> by {{steep.username}}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}

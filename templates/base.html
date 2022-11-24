@@ -13,16 +13,17 @@
   </head>
   <body>
     <nav class="navbar bg-light">
-      <a href="/">Steepr</a>
+      <a style="font-size: 2.2rem" href="/">Steepr</a>
       <ul class="navbar-nav">
         {% if not g.user %}
         <li><a href="/signup">Sign up</a></li>
         <li><a href="/login">Log in</a></li>
         {% else %}
         <li>
-          <a href="/users/{{ g.user.id }}"></a>
+          <a href="/users/{{ g.user.user_id }}"
+            >Welcome {{ g.user.username }}
+          </a>
         </li>
-        <li><a href="/messages/new">New Message</a></li>
         <li><a href="/logout">Log out</a></li>
         {% endif %}
       </ul>

@@ -6,18 +6,21 @@ from flask_sqlalchemy import SQLAlchemy
 bcrypt = Bcrypt()
 db = SQLAlchemy()
 
+def connect_db(app):
+    """Connect this database to provided Flask app.
+    """
+
+    db.app = app
+    db.init_app(app)
+
 class User(db.Model):
   '''User class.'''
 
-  __tablename__: 'users'
-
-  user_id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
+  __tablename__ = 'users'
 
   username = db.Column(
         db.Text,
+        primary_key=True,
         nullable=False,
         unique=True
     )
@@ -27,10 +30,7 @@ class User(db.Model):
           nullable=False
       )
 
-  steeps = db.Column(
-          db.Integer,
-          db.ForeignKey('steeps.steep_id', ondelete='CASCADE')
-      )
+  steeps = db.relationship('Steep', backref='user', cascade='all, delete')
 
   @classmethod
   def signup(cls, username, password):
@@ -40,7 +40,6 @@ class User(db.Model):
 
     user = User(
             username=username,
-            email=email,
             password=hashed_pwd
         )
 
@@ -63,20 +62,31 @@ class User(db.Model):
 class Steep(db.Model):
   '''Steep class.'''
 
-  __tablename__: 'steeps'
+  __tablename__ = 'steeps'
 
   steep_id = db.Column(
         db.Integer,
         primary_key=True
     )
 
-  username = db.Column(
+  name = db.Column(
         db.Text,
-        nullable=False,
-        unique=True
+        nullable=False
     )
 
-  password = db.Column(
+  genre = db.Column(
           db.Text,
           nullable=False
       )
+
+  duration = db.Column(
+          db.Text,
+          nullable=False
+      )
+
+  song_id = db.Column(
+          db.Text,
+          nullable=True
+  )
+
+  username = db.Column(db.Text, db.ForeignKey('users.username'), nullable=False)
