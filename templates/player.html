@@ -1,11 +1,9 @@
 {% extends 'homepage.html' %} {% block content %}
 <div class="container">
+  <form class="form">
+    <button formaction="/" class="btn btn-success">Start a New Steep</button>
+  </form>
   <br />
-  {% for msg in get_flashed_messages() %}
-  <div class="alert alert-info">{{msg}}</div>
-  {% endfor %}
-  <br />
-
   <iframe
     style="border-radius: 12px"
     src="https://open.spotify.com/embed/track/{{src_id}}?utm_source=generator"
@@ -17,15 +15,24 @@
     loading="lazy"
   ></iframe>
   <br />
+  <br />
+  {% if g.user %}
+  <div class="container">
+    <div class="row justify-content-md-center">
+      <div class="col-md-7 col-lg-5">
+        <!-- <h2 class="join-message">Save Steep</h2> -->
+        <form action="/savesteep" method="POST" id="steep_form">
+          {{ form2.hidden_tag() }} {% for field in form2 if
+          field.widget.input_type != 'hidden' %} {% for error in field.errors %}
+          <span class="text-danger">{{ error }}</span>
+          {% endfor %} {{ field(placeholder=field.label.text,
+          class_="form-control") }} <br />{% endfor %}
 
-  <form>
-    <button formaction="/" class="btn btn-success">Start a New Steep</button>
-    {% if g.user %}
-    <button class="btn btn-dark">Save Steep to Your Profile</button>
-    <button class="btn btn-primary">
-      Save Steep to Your Profile with this Track
-    </button>
-    {% endif %}
-  </form>
-  {% endblock %}
+          <button class="btn btn-dark">Save Steep to Your Profile</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 </div>
+{% endblock %}

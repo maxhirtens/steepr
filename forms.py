@@ -19,3 +19,14 @@ class UserAddForm(FlaskForm):
 
   username = StringField('Username', validators=[InputRequired()])
   password = PasswordField('Password', validators=[InputRequired()])
+
+class LoginForm(FlaskForm):
+  '''Log in if valid.'''
+
+  username = StringField('Username', validators=[InputRequired()])
+  password = PasswordField('Password', validators=[InputRequired()])
+
+class SteepAddForm(FlaskForm):
+  '''Add new steep to DB.'''
+
+  name = StringField('Name', validators=[InputRequired()])

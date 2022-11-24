@@ -46,18 +46,18 @@ class User(db.Model):
     db.session.add(user)
     return user
 
-    @classmethod
-    def authenticate(cls, username, password):
-        """Find user with `username` and `password`."""
+  @classmethod
+  def authenticate(cls, username, password):
+    """Find user with `username` and `password`."""
 
-        user = cls.query.filter_by(username=username).first()
+    user = cls.query.filter_by(username=username).first()
 
-        if user:
-            is_auth = bcrypt.check_password_hash(user.password, password)
-            if is_auth:
-                return user
+    if user:
+        is_auth = bcrypt.check_password_hash(user.password, password)
+        if is_auth:
+            return user
 
-        return False
+    return False
 
 class Steep(db.Model):
   '''Steep class.'''

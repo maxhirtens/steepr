@@ -27,6 +27,16 @@
     </div>
   </div>
   <br />
+  {% if g.user %}
+  <div class="col-xs-1 text-center">
+    <h3>Your Steeps</h3>
+    <ul style="list-style: none" class="text-center">
+      {% for steep in g.user.steeps %}
+      <li><a href="">{{steep.name}}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
   <div class="col-xs-1 text-center">
     <h3>Recent Steeps</h3>
     <ul style="list-style: none" class="text-center">

@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, redirect, flash, jsonify, ses
 from random import randint, choice
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
-from forms import SearchForm, UserAddForm
+from forms import SearchForm, UserAddForm, LoginForm, SteepAddForm
 from spotipy.oauth2 import SpotifyClientCredentials
 from models import db, connect_db, User, Steep
 import spotipy
@@ -17,6 +17,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['WTF_CSRF_ENABLED'] = True
 debug = DebugToolbarExtension(app)
+
+CURR_USER_KEY = "curr_user"
 
 connect_db(app)
 
@@ -58,27 +60,28 @@ def get_track(minutes, genre):
 
     return src_id
 
-# *********View Functions**********
+# *********User Login Functions**********
 
-@app.route('/', methods=['GET', 'POST'])
-def homepage():
-  '''Show user form and embedded player.'''
+@app.before_request
+def add_user_to_g():
+    """If we're logged in, add curr user to Flask global."""
 
-  form = SearchForm()
+    if CURR_USER_KEY in session:
+        g.user = User.query.get(session[CURR_USER_KEY])
 
-  steeps = Steep.query.all()
+    else:
+        g.user = None
 
-  if form.validate_on_submit():
-    minutes = int(form.minutes.data)
-    genre = form.genre.data
+def do_login(user):
+    """Log in user."""
 
-    src_id = get_track(minutes, genre)
+    session[CURR_USER_KEY] = user.username
 
-    flash(f'You chose a {genre} song that is ~{minutes} minutes long. Press play to start steeping! Your tea will be ready when the song is over.')
-    return render_template('player.html', src_id=src_id, genre=genre, minutes=minutes)
+def do_logout():
+    """Logout user."""
 
-  else:
-    return render_template('homepage.html', form=form, steeps=steeps)
+    if CURR_USER_KEY in session:
+        del session[CURR_USER_KEY]
 
 @app.route('/signup', methods=['GET', 'POST'])
 def sign_user_up():
@@ -93,14 +96,96 @@ def sign_user_up():
     )
     db.session.commit()
 
+    do_login(user)
+
     return redirect('/')
 
   else:
     return render_template('signup.html', form=form)
 
 
-
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def log_user_in():
   '''Authenticate and log in user.'''
+  form = LoginForm()
+
+  if form.validate_on_submit():
+    user = User.authenticate(form.username.data, form.password.data)
+
+    if user:
+      do_login(user)
+      flash(f"Hello, {user.username}!", "success")
+      return redirect('/')
+
+  return render_template('login.html', form=form)
+
+
+@app.route('/logout')
+def log_user_out():
+  '''Log user out, remove from session.'''
+
+  do_logout()
+  flash(f"You have logged out!", "success")
   return redirect('/')
+
+# *********View Functions**********
+
+@app.route('/', methods=['GET', 'POST'])
+def homepage():
+  '''Show user form and embedded player.'''
+
+  form = SearchForm()
+
+  another_form = SteepAddForm()
+
+  steeps = Steep.query.limit(5)
+
+  if form.validate_on_submit():
+    minutes = int(form.minutes.data)
+    genre = form.genre.data
+
+    src_id = get_track(minutes, genre)
+
+    flash(f'You chose a {genre} song that is ~{minutes} minutes long. Press play to start steeping! Your tea will be ready when the song is over.')
+    return render_template('player.html', src_id=src_id, genre=genre, minutes=minutes, form2=another_form)
+
+  else:
+    return render_template('homepage.html', form=form, steeps=steeps)
+
+@app.route('/savesteep', methods=['GET', 'POST'])
+def add_steep():
+  '''add a steep to db.'''
+
+  form = SteepAddForm()
+
+  user = User.query.get(session[CURR_USER_KEY])
+
+  if form.validate_on_submit():
+
+        steep = Steep(name=form.name.data, genre='', duration='')
+        user.steeps.append(steep)
+        db.session.commit()
+        flash('Steep saved')
+
+        return redirect('/')
+
+  flash('Something went wrong, please try again')
+  return redirect('/')
+
+
+##############################################################################
+# Turn off all caching in Flask
+#   (useful for dev; in production, this kind of stuff is typically
+#   handled elsewhere)
+#
+# https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
+
+@app.after_request
+def add_header(req):
+    """Add non-caching headers on every request."""
+
+    req.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    req.headers["Pragma"] = "no-cache"
+    req.headers["Expires"] = "0"
+    req.headers['Cache-Control'] = 'public, max-age=0'
+    return req
