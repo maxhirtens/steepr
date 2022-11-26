@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, redirect, flash, jsonify, ses
 from random import randint, choice
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
-from forms import SearchForm, UserAddForm, LoginForm, SteepAddForm
+from forms import UserAddForm, LoginForm, SteepAddForm
 from spotipy.oauth2 import SpotifyClientCredentials
 from models import db, connect_db, User, Steep
 import spotipy
@@ -14,7 +14,7 @@ app.config['SECRET_KEY'] = 'boomerang'
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql:///steepr"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
+# app.config['SQLALCHEMY_ECHO'] = True
 app.config['WTF_CSRF_ENABLED'] = True
 debug = DebugToolbarExtension(app)
 
@@ -28,7 +28,7 @@ load_dotenv()
 
 def get_track(minutes, genre):
     '''Get matching track from Spotify API, send src id to embedded player.'''
-
+    # with app.app_context():
     # Using Spotipy for Auth help
     sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 
@@ -52,11 +52,9 @@ def get_track(minutes, genre):
       rounded_duration = round((duration/60000), 2)
 
       if rounded_duration >= (minutes-0.2) and rounded_duration <= (minutes+0.2):
-        print(f"'{name}' by {artist} is {rounded_duration} minutes, which is about {minutes} minutes. The id is {id}.")
         ids.append(id)
 
     src_id = choice(ids)
-    # print(src_id)
 
     return src_id
 
@@ -130,27 +128,51 @@ def log_user_out():
 
 # *********View Functions**********
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def homepage():
-  '''Show user form and embedded player.'''
+  '''Show track search form.'''
 
-  form = SearchForm()
+  steeps = Steep.query.order_by(Steep.steep_id.desc()).limit(5)
 
-  another_form = SteepAddForm()
+  return render_template('homepage.html', steeps=steeps)
 
-  steeps = Steep.query.limit(5)
+@app.route('/player', methods=['GET', 'POST'])
+def show_player():
+  '''Shows player to begin steeping.'''
+  form = SteepAddForm()
 
-  if form.validate_on_submit():
-    minutes = int(form.minutes.data)
-    genre = form.genre.data
+  minutes = int(request.args.get('minutes'))
+  session['minutes'] = minutes
 
-    src_id = get_track(minutes, genre)
+  genre = request.args.get('genre')
+  session['genre'] = genre
 
-    flash(f'You chose a {genre} song that is ~{minutes} minutes long. Press play to start steeping! Your tea will be ready when the song is over.')
-    return render_template('player.html', src_id=src_id, genre=genre, minutes=minutes, form2=another_form)
+  src_id = get_track(minutes, genre)
+  session['src_id'] = src_id
 
+  # print(f"Minutes: {minutes}, Genre: {genre}, SRC: {src_id}")
+
+  flash(f'You chose a {genre} song that is ~{minutes} minutes long. Press play to start steeping! Your tea will be ready when the song is over.')
+  return render_template('player.html', src_id=src_id, genre=genre, minutes=minutes, form=form)
+
+@app.route('/player/<int:steep_id>', methods=['GET', 'POST'])
+def show_player_for_saved_steep(steep_id):
+  '''This is a second version of the player to play saved steeps with a specific track saved.'''
+  steep = Steep.query.get(steep_id)
+  print(steep.duration, steep.genre)
+  minutes=steep.duration
+  genre=steep.genre
+
+  if steep.song_id:
+    print(steep.song_id)
+    src_id = steep.song_id
   else:
-    return render_template('homepage.html', form=form, steeps=steeps)
+    src_id = get_track(int(minutes), genre)
+
+  print(f"Minutes: {minutes}, Genre: {genre}, SRC: {src_id}")
+
+  flash(f'You chose a {genre} song that is ~{minutes} minutes long. Press play to start steeping! Your tea will be ready when the song is over.')
+  return render_template('player2.html', src_id=src_id, genre=genre, minutes=minutes)
 
 @app.route('/savesteep', methods=['GET', 'POST'])
 def add_steep():
@@ -159,10 +181,9 @@ def add_steep():
   form = SteepAddForm()
 
   user = User.query.get(session[CURR_USER_KEY])
-
   if form.validate_on_submit():
 
-        steep = Steep(name=form.name.data, genre='', duration='')
+        steep = Steep(name=form.name.data, genre=session['genre'], duration=session['minutes'])
         user.steeps.append(steep)
         db.session.commit()
         flash('Steep saved')
@@ -172,20 +193,33 @@ def add_steep():
   flash('Something went wrong, please try again')
   return redirect('/')
 
+@app.route('/savespecificsteep', methods=['GET', 'POST'])
+def add_specific_steep():
+  '''add a steep to db.'''
 
-##############################################################################
-# Turn off all caching in Flask
-#   (useful for dev; in production, this kind of stuff is typically
-#   handled elsewhere)
-#
-# https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
+  form = SteepAddForm()
 
-@app.after_request
-def add_header(req):
-    """Add non-caching headers on every request."""
+  user = User.query.get(session[CURR_USER_KEY])
+  if form.validate_on_submit():
 
-    req.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    req.headers["Pragma"] = "no-cache"
-    req.headers["Expires"] = "0"
-    req.headers['Cache-Control'] = 'public, max-age=0'
-    return req
+        steep = Steep(name=form.name.data, genre=session['genre'], duration=session['minutes'], song_id=session['src_id'])
+        user.steeps.append(steep)
+        db.session.commit()
+        flash('Steep saved')
+
+        return redirect('/')
+
+  flash('Something went wrong, please try again')
+  return redirect('/')
+
+@app.route('/steeps/<int:steep_id>')
+def show_steep_info(steep_id):
+  '''Show steep info, option to send it back to player.'''
+
+  steep = Steep.query.get_or_404(steep_id)
+
+  session['minutes'] = steep.duration
+  session['genre'] = steep.genre
+  session['src_id'] = steep.song_id
+
+  return render_template('steep.html', steep=steep)

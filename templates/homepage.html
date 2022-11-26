@@ -1,10 +1,8 @@
 {% extends 'base.html' %} {% block content %}
 
 <div class="container">
-  <br />
-
   <div class="row justify-content-md-center">
-    <div class="col-md-4">
+    <div class="col-md-5">
       <h2 class="join-message">Create Your Steep.</h2>
       <small
         ><a href="https://accounts.spotify.com/en/login" target="_blank"
@@ -12,27 +10,37 @@
         ></small
       >
       <br />
-      <form method="POST" id="user_form">
-        {{ form.hidden_tag() }} {% for field in form if field.widget.input_type
-        != 'hidden' and field.name != 'password' %} {% for error in
-        field.errors%}
-        <span class="text-danger">{{ error }}</span>
-        {% endfor %} {{ field(placeholder=field.label.text,
-        class_="form-control") }} <br />{% endfor %}
-
+      <form action="/player" method="GET" class="form-group" id="user_form">
+        <label for="minutes">Minutes</label>
+        <select class="form-control" name="minutes">
+          <option value="">--Please choose a time--</option>
+          <option value="2">2 minutes</option>
+          <option value="3">3 minutes</option>
+          <option value="4">4 minutes</option>
+          <option value="5">5 minutes</option>
+          <option value="6">6 minutes</option>
+        </select>
+        <label for="genre">Genre</label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="e.g. 'folk' or 'afrobeat'"
+          name="genre"
+        />
+        <br />
         <div class="edit-btn-area">
-          <button class="btn btn-success">Submit</button>
+          <button type="submit" class="btn btn-success">Submit</button>
         </div>
       </form>
     </div>
   </div>
   <br />
-  {% if g.user %}
+  {% if g.user.steeps %}
   <div class="col-xs-1 text-center">
     <h3>Your Steeps</h3>
     <ul style="list-style: none" class="text-center">
-      {% for steep in g.user.steeps %}
-      <li><a href="">{{steep.name}}</a></li>
+      {% for steep in g.user.steeps|reverse %}
+      <li><a href="/steeps/{{steep.steep_id}}">{{steep.name}}</a></li>
       {% endfor %}
     </ul>
   </div>
@@ -41,7 +49,10 @@
     <h3>Recent Steeps</h3>
     <ul style="list-style: none" class="text-center">
       {% for steep in steeps %}
-      <li><a href="">{{steep.name}}</a> by {{steep.username}}</li>
+      <li>
+        <a href="/steeps/{{steep.steep_id}}">{{steep.name}}</a> by
+        {{steep.username}}
+      </li>
       {% endfor %}
     </ul>
   </div>

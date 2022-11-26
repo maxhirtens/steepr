@@ -1,0 +1,22 @@
+{% extends 'homepage.html' %} {% block content %}
+
+<div class="container">
+  <h1>Your Steep Info</h1>
+  <ul class="list">
+    <li>Name: {{steep.name}}</li>
+    <li>Genre: {{steep.genre.title()}}</li>
+    <li>Minutes: {{steep.duration}}</li>
+    {%if steep.song_id %}
+    <li>Track ID: {{steep.song_id}}</li>
+    {% endif %}
+  </ul>
+  <form
+    action="/player/{{steep.steep_id}}"
+    method="GET"
+    class="form-group"
+    id="steep_replay_form"
+  >
+    <button class="btn btn-success">Play this Steep!</button>
+  </form>
+</div>
+{% endblock %}

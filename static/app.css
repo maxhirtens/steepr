@@ -1,3 +1,7 @@
 body {
   background-color: rgb(28, 131, 172);
 }
+
+h1, h2, h3  {
+  color: #ac9071;
+}

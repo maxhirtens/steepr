@@ -19,11 +19,7 @@
         <li><a href="/signup">Sign up</a></li>
         <li><a href="/login">Log in</a></li>
         {% else %}
-        <li>
-          <a href="/users/{{ g.user.user_id }}"
-            >Welcome {{ g.user.username }}
-          </a>
-        </li>
+        <li>Welcome {{ g.user.username }}</li>
         <li><a href="/logout">Log out</a></li>
         {% endif %}
       </ul>

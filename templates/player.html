@@ -19,16 +19,26 @@
   {% if g.user %}
   <div class="container">
     <div class="row justify-content-md-center">
-      <div class="col-md-7 col-lg-5">
+      <div class="col-md-8 col-lg-5">
         <!-- <h2 class="join-message">Save Steep</h2> -->
-        <form action="/savesteep" method="POST" id="steep_form">
-          {{ form2.hidden_tag() }} {% for field in form2 if
+        <form method="POST" id="steep_form">
+          {{ form.hidden_tag() }} {% for field in form if
           field.widget.input_type != 'hidden' %} {% for error in field.errors %}
           <span class="text-danger">{{ error }}</span>
           {% endfor %} {{ field(placeholder=field.label.text,
           class_="form-control") }} <br />{% endfor %}
 
-          <button class="btn btn-dark">Save Steep to Your Profile</button>
+          <button formaction="/savesteep" class="btn btn-dark form-control">
+            Save Steep to Your Profile
+          </button>
+          <br />
+          <br />
+          <button
+            formaction="/savespecificsteep"
+            class="btn btn-secondary form-control"
+          >
+            Save Steep to Your Profile with this Track
+          </button>
         </form>
       </div>
     </div>
