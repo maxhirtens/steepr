@@ -6,6 +6,7 @@ from forms import UserAddForm, LoginForm, SteepAddForm
 from spotipy.oauth2 import SpotifyClientCredentials
 from models import db, connect_db, User, Steep
 import spotipy
+from pprint import pprint
 from dotenv import load_dotenv
 
 app = Flask(__name__)
@@ -26,12 +27,12 @@ load_dotenv()
 
 # *********Global Functions**********
 
+sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
+
 def get_track(minutes, genre):
     '''Get matching track from Spotify API, send src id to embedded player.'''
-    # with app.app_context():
-    # Using Spotipy for Auth help
-    sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 
+    # Using Spotipy for Auth help
     offset = randint(0, 100)
 
     result = sp.search(q='genre:' + genre, type='track',market='US',limit=50, offset=offset)
@@ -57,6 +58,13 @@ def get_track(minutes, genre):
     src_id = choice(ids)
 
     return src_id
+
+
+def get_track_from_src(src_id):
+  '''This is for the steep info page. It gets a track name from the src_id in session.'''
+
+  track = sp.track(src_id)
+  return track
 
 # *********User Login Functions**********
 
@@ -147,13 +155,15 @@ def show_player():
   genre = request.args.get('genre')
   session['genre'] = genre
 
-  src_id = get_track(minutes, genre)
-  session['src_id'] = src_id
+  try:
+    src_id = get_track(minutes, genre)
+    session['src_id'] = src_id
+    flash(f'Press play to start steeping! Your tea will be ready when the song is over.')
+    return render_template('player.html', src_id=src_id, genre=genre, minutes=minutes, form=form)
 
-  # print(f"Minutes: {minutes}, Genre: {genre}, SRC: {src_id}")
-
-  flash(f'You chose a {genre} song that is ~{minutes} minutes long. Press play to start steeping! Your tea will be ready when the song is over.')
-  return render_template('player.html', src_id=src_id, genre=genre, minutes=minutes, form=form)
+  except:
+    flash("That didn't work, let's try again...", 'error')
+    return redirect('/')
 
 @app.route('/player/<int:steep_id>', methods=['GET', 'POST'])
 def show_player_for_saved_steep(steep_id):
@@ -169,9 +179,7 @@ def show_player_for_saved_steep(steep_id):
   else:
     src_id = get_track(int(minutes), genre)
 
-  print(f"Minutes: {minutes}, Genre: {genre}, SRC: {src_id}")
-
-  flash(f'You chose a {genre} song that is ~{minutes} minutes long. Press play to start steeping! Your tea will be ready when the song is over.')
+  flash(f'Press play to start steeping! Your tea will be ready when the song is over.')
   return render_template('player2.html', src_id=src_id, genre=genre, minutes=minutes)
 
 @app.route('/savesteep', methods=['GET', 'POST'])
@@ -222,4 +230,12 @@ def show_steep_info(steep_id):
   session['genre'] = steep.genre
   session['src_id'] = steep.song_id
 
-  return render_template('steep.html', steep=steep)
+  track_title = ''
+  artist = ''
+
+  if session['src_id'] is not None:
+    track = get_track_from_src(session['src_id'])
+    track_title = track['name']
+    artist = track['artists'][0]['name']
+
+  return render_template('steep.html', steep=steep, track_title=track_title, artist=artist)

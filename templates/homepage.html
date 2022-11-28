@@ -12,11 +12,11 @@
       <br />
       <form action="/player" method="GET" class="form-group" id="user_form">
         <label for="minutes">Minutes</label>
-        <select class="form-control" name="minutes">
-          <option value="">--Please choose a time--</option>
+        <select class="form-control required" name="minutes">
+          <!-- <option value="">--Please choose a time--</option> -->
           <option value="2">2 minutes</option>
           <option value="3">3 minutes</option>
-          <option value="4">4 minutes</option>
+          <option value="4" selected>4 minutes</option>
           <option value="5">5 minutes</option>
           <option value="6">6 minutes</option>
         </select>
@@ -24,7 +24,7 @@
         <input
           type="text"
           class="form-control"
-          placeholder="e.g. 'folk' or 'afrobeat'"
+          placeholder="e.g. 'folk'. Leave blank to randomize."
           name="genre"
         />
         <br />
