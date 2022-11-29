@@ -33,9 +33,15 @@ def get_track(minutes, genre):
     '''Get matching track from Spotify API, send src id to embedded player.'''
 
     # Using Spotipy for Auth help
+
+    print(f'getting track for {genre} - {minutes}')
+
     offset = randint(0, 100)
 
-    result = sp.search(q='genre:' + genre, type='track',market='US',limit=50, offset=offset)
+    if genre:
+      result = sp.search(q='genre:' + genre, type='track',market='US',limit=50, offset=offset)
+    else:
+      result = sp.search(q='%25s%25', type='track',market='US',limit=50, offset=offset)
 
     tracks = result['tracks']['items']
 
@@ -162,7 +168,7 @@ def show_player():
     return render_template('player.html', src_id=src_id, genre=genre, minutes=minutes, form=form)
 
   except:
-    flash("That didn't work, let's try again...", 'error')
+    flash("No matching tracks, let's use another genre or time.", 'error')
     return redirect('/')
 
 @app.route('/player/<int:steep_id>', methods=['GET', 'POST'])

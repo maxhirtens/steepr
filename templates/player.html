@@ -43,6 +43,10 @@
       </div>
     </div>
   </div>
+  {% endif %} {% if not g.user %}
+  <div class="container">
+    <small>Sign up/log in for access to more features.</small>
+  </div>
   {% endif %}
 </div>
 {% endblock %}
