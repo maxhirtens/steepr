@@ -36,12 +36,12 @@ def get_track(minutes, genre):
 
     print(f'getting track for {genre} - {minutes}')
 
-    offset = randint(0, 100)
+    offset = randint(0, 200)
 
     if genre:
       result = sp.search(q='genre:' + genre, type='track',market='US',limit=50, offset=offset)
     else:
-      result = sp.search(q='%25s%25', type='track',market='US',limit=50, offset=offset)
+      result = sp.search(q='%s%', type='track',market='US',limit=50, offset=offset)
 
     tracks = result['tracks']['items']
 
