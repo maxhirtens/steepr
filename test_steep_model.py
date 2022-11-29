@@ -50,25 +50,25 @@ class SteepModelTestCase(TestCase):
         self.assertEqual(self.u.steeps[0].name, "Morning Black Tea")
         self.assertEqual(self.u.steeps[0].genre, "jazz")
 
-  def test_steep_ids(self):
+    def test_steep_ids(self):
 
-    s1 = Steep(
-            name="Morning Black Tea",
-            genre='jazz',
-            duration='5',
-            username='frank131'
-        )
+      s1 = Steep(
+              name="Morning Black Tea",
+              genre='jazz',
+              duration='5',
+              username='frank131'
+          )
 
-    s2 = Steep(
-            name="Evening Green Tea",
-            genre='classical',
-            duration='2',
-            username='frank131'
-        )
+      s2 = Steep(
+              name="Evening Green Tea",
+              genre='classical',
+              duration='2',
+              username='frank131'
+          )
 
-    db.session.add(s1)
-    db.session.add(s2)
-    db.session.commit()
+      db.session.add(s1)
+      db.session.add(s2)
+      db.session.commit()
 
-    self.assertEqual(s1.steep_id, 1)
-    self.assertEqual(s2.steep_id, 2)
+      self.assertEqual(s1.steep_id, 1)
+      self.assertEqual(s2.steep_id, 2)

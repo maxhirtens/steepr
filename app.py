@@ -27,12 +27,11 @@ load_dotenv()
 
 # *********Global Functions**********
 
+# Using Spotipy for Auth help
 sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 
 def get_track(minutes, genre):
     '''Get matching track from Spotify API, send src id to embedded player.'''
-
-    # Using Spotipy for Auth help
 
     print(f'getting track for {genre} - {minutes}')
 
