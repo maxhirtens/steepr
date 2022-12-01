@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect, flash, jsonify, session, g
 from random import randint, choice
 from flask_debugtoolbar import DebugToolbarExtension
+from sqlalchemy.exc import IntegrityError
 import requests
 from forms import UserAddForm, LoginForm, SteepAddForm
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -100,12 +101,18 @@ def sign_user_up():
 
   form = UserAddForm()
 
+
   if form.validate_on_submit():
-    user = User.signup(
-      username = form.username.data,
-      password = form.password.data
-    )
-    db.session.commit()
+    try:
+      user = User.signup(
+        username = form.username.data,
+        password = form.password.data
+      )
+      db.session.commit()
+
+    except IntegrityError:
+        flash("Username already taken!", 'danger')
+        return render_template('signup.html', form=form)
 
     do_login(user)
 
@@ -128,6 +135,8 @@ def log_user_in():
       flash(f"Hello, {user.username}!", "success")
       return redirect('/')
 
+    flash("Wrong username/password.", 'danger')
+
   return render_template('login.html', form=form)
 
 
@@ -136,7 +145,7 @@ def log_user_out():
   '''Log user out, remove from session.'''
 
   do_logout()
-  flash(f"You have logged out!", "success")
+  flash("You have logged out!", "success")
   return redirect('/')
 
 # *********View Functions**********
@@ -163,28 +172,26 @@ def show_player():
   try:
     src_id = get_track(minutes, genre)
     session['src_id'] = src_id
-    flash(f'Press play to start steeping! Your tea will be ready when the song is over.')
+    flash('Press play to start steeping! Your tea will be ready when the song is over.', 'info')
     return render_template('player.html', src_id=src_id, genre=genre, minutes=minutes, form=form)
 
   except:
-    flash("No matching tracks, let's use another genre or time.", 'error')
+    flash("No matching tracks, please use another genre or time.", 'danger')
     return redirect('/')
 
 @app.route('/player/<int:steep_id>', methods=['GET', 'POST'])
 def show_player_for_saved_steep(steep_id):
   '''This is a second version of the player to play saved steeps with a specific track saved.'''
   steep = Steep.query.get(steep_id)
-  print(steep.duration, steep.genre)
   minutes=steep.duration
   genre=steep.genre
 
   if steep.song_id:
-    print(steep.song_id)
     src_id = steep.song_id
   else:
     src_id = get_track(int(minutes), genre)
 
-  flash(f'Press play to start steeping! Your tea will be ready when the song is over.')
+  flash(f'Press play to start steeping! Your tea will be ready when the song is over.', 'info')
   return render_template('player2.html', src_id=src_id, genre=genre, minutes=minutes)
 
 @app.route('/savesteep', methods=['GET', 'POST'])
@@ -199,11 +206,11 @@ def add_steep():
         steep = Steep(name=form.name.data, genre=session['genre'], duration=session['minutes'])
         user.steeps.append(steep)
         db.session.commit()
-        flash('Steep saved')
+        flash('Steep saved', 'success')
 
         return redirect('/')
 
-  flash('Something went wrong, please try again')
+  flash('Something went wrong, please try again', 'danger')
   return redirect('/')
 
 @app.route('/savespecificsteep', methods=['GET', 'POST'])
@@ -222,7 +229,7 @@ def add_specific_steep():
 
         return redirect('/')
 
-  flash('Something went wrong, please try again')
+  flash('Something went wrong, please try again', 'danger')
   return redirect('/')
 
 @app.route('/steeps/<int:steep_id>')
@@ -244,3 +251,19 @@ def show_steep_info(steep_id):
     artist = track['artists'][0]['name']
 
   return render_template('steep.html', steep=steep, track_title=track_title, artist=artist)
+
+@app.route('/steeps/<int:steep_id>/delete', methods=['GET', 'POST'])
+def delete_steep(steep_id):
+  '''Delete steep from db.'''
+
+  steep = Steep.query.get(steep_id)
+
+  if g.user.username != steep.username:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+
+  db.session.delete(steep)
+  db.session.commit()
+
+  return redirect('/')

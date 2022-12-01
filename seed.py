@@ -17,8 +17,8 @@ db.session.commit()
 
 s1 = Steep(name='Evening Green Tea', genre='classical', duration='2', username='tom121')
 s2 = Steep(name='Morning English Breakfast', genre='folk', duration='5', username='tom121')
-s3 = Steep(name='Afternoon Rooibos', genre='punk', duration='4', username='tom121')
-s4 = Steep(name='Morning Oolong', genre='jazz', duration='3', username='linda761', song_id='2Pi0rY9FcbaecqO0AyhXb')
+s3 = Steep(name='Afternoon Rooibos', genre='jazz', duration='3', username='tom121')
+s4 = Steep(name='Morning Oolong', genre='punk', duration='4', username='linda761', song_id='0rOTMSSa6yscfOrGnzfheM')
 
 db.session.add(s1)
 db.session.add(s2)

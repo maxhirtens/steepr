@@ -4,19 +4,33 @@
   <h1>Your Steep Info</h1>
   <ul class="list">
     <li>Name: {{steep.name}}</li>
+    {% if steep.genre %}
     <li>Genre: {{steep.genre.title()}}</li>
+    {% else %}
+    <li>Genre: Random</li>
+    {% endif %}
     <li>Minutes: {{steep.duration}}</li>
     {%if steep.song_id %}
     <li>Track Info: {{track_title}} by {{artist}}</li>
     {% endif %}
   </ul>
-  <form
-    action="/player/{{steep.steep_id}}"
-    method="GET"
-    class="form-group"
-    id="steep_replay_form"
-  >
-    <button class="btn btn-success">Play this Steep!</button>
+  <form class="form-group" id="steep_options_form">
+    <button
+      formaction="/player/{{steep.steep_id}}"
+      formmethod="GET"
+      class="btn btn-success"
+    >
+      Play this Steep!
+    </button>
+    {% if g.user.username == steep.username %}
+    <button
+      class="btn btn-danger"
+      formaction="/steeps/{{steep.steep_id}}/delete"
+      formmethod="POST"
+    >
+      Delete this Steep
+    </button>
+    {% endif %}
   </form>
 </div>
 {% endblock %}
