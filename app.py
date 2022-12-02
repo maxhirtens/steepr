@@ -2,12 +2,10 @@ from flask import Flask, request, render_template, redirect, flash, jsonify, ses
 from random import randint, choice
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-import requests
 from forms import UserAddForm, LoginForm, SteepAddForm
 from spotipy.oauth2 import SpotifyClientCredentials
 from models import db, connect_db, User, Steep
 import spotipy
-from pprint import pprint
 from dotenv import load_dotenv
 import os
 
