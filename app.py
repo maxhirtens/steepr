@@ -31,6 +31,27 @@ load_dotenv()
 # Using Spotipy for Auth help
 sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
 
+def search_json(minutes, tracks):
+  '''Search through json for tracks that match selected minutes.'''
+
+  ids = []
+
+  for item in tracks:
+      name = item['name']
+
+      artist = item['artists'][0]['name']
+
+      id = item['id']
+
+      duration = item['duration_ms']
+
+      rounded_duration = round((duration/60000), 2)
+
+      if rounded_duration >= (minutes-0.2) and rounded_duration <= (minutes+0.2):
+        ids.append(id)
+
+  return ids
+
 def get_track(minutes, genre):
     '''Get matching track from Spotify API, send src id to embedded player.'''
 
@@ -45,26 +66,11 @@ def get_track(minutes, genre):
 
     tracks = result['tracks']['items']
 
-    ids = []
-
-    for item in tracks:
-      name = item['name']
-
-      artist = item['artists'][0]['name']
-
-      id = item['id']
-
-      duration = item['duration_ms']
-
-      rounded_duration = round((duration/60000), 2)
-
-      if rounded_duration >= (minutes-0.2) and rounded_duration <= (minutes+0.2):
-        ids.append(id)
+    ids = search_json(minutes, tracks)
 
     src_id = choice(ids)
 
     return src_id
-
 
 def get_track_from_src(src_id):
   '''This is for the steep info page. It gets a track name from the src_id in session.'''
@@ -172,7 +178,7 @@ def show_player():
   try:
     src_id = get_track(minutes, genre)
     session['src_id'] = src_id
-    flash('Press play to start steeping! Your tea will be ready when the song is over.', 'info')
+    flash(f'You chose a ~{minutes} minute long {genre} song. Press play! Your tea will be ready when the song is over.', 'info')
     return render_template('player.html', src_id=src_id, genre=genre, minutes=minutes, form=form)
 
   except:
@@ -191,7 +197,7 @@ def show_player_for_saved_steep(steep_id):
   else:
     src_id = get_track(int(minutes), genre)
 
-  flash(f'Press play to start steeping! Your tea will be ready when the song is over.', 'info')
+  flash(f'You chose a ~{minutes} long {genre} song. Press play! Your tea will be ready when the song is over.', 'info')
   return render_template('player2.html', src_id=src_id, genre=genre, minutes=minutes)
 
 @app.route('/savesteep', methods=['GET', 'POST'])
@@ -261,7 +267,6 @@ def delete_steep(steep_id):
   if g.user.username != steep.username:
         flash("Access unauthorized.", "danger")
         return redirect("/")
-
 
   db.session.delete(steep)
   db.session.commit()
