@@ -9,10 +9,11 @@ from models import db, connect_db, User, Steep
 import spotipy
 from pprint import pprint
 from dotenv import load_dotenv
+import os
 
 app = Flask(__name__)
 app.app_context().push()
-app.config['SECRET_KEY'] = 'boomerang'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'secret1')
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql:///steepr"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
