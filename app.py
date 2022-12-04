@@ -230,7 +230,7 @@ def add_specific_steep():
         steep = Steep(name=form.name.data, genre=session['genre'], duration=session['minutes'], song_id=session['src_id'])
         user.steeps.append(steep)
         db.session.commit()
-        flash('Steep saved')
+        flash('Steep saved', 'success')
 
         return redirect('/')
 
@@ -271,3 +271,8 @@ def delete_steep(steep_id):
   db.session.commit()
 
   return redirect('/')
+
+@app.errorhandler(404)
+def page_not_found(e):
+    """Show 404 NOT FOUND page."""
+    return render_template('404.html'), 404
