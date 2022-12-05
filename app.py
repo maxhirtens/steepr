@@ -13,7 +13,13 @@ app = Flask(__name__)
 app.app_context().push()
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'secret1')
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', "postgresql:///steepr")
+try:
+    prodURI = os.getenv('DATABASE_URL')
+    prodURI = prodURI.replace("postgres://", "postgresql://")
+    app.config['SQLALCHEMY_DATABASE_URI'] = prodURI
+except:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///steepr'
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', "postgresql:///steepr")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # app.config['SQLALCHEMY_ECHO'] = True
 app.config['WTF_CSRF_ENABLED'] = True
