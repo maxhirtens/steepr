@@ -19,17 +19,13 @@ try:
     app.config['SQLALCHEMY_DATABASE_URI'] = prodURI
 except:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///steepr'
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', "postgresql:///steepr")
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.config['SQLALCHEMY_ECHO'] = True
 app.config['WTF_CSRF_ENABLED'] = True
 debug = DebugToolbarExtension(app)
 
 CURR_USER_KEY = "curr_user"
 
 connect_db(app)
-
-load_dotenv()
 
 # *********Global Functions**********
 
@@ -202,7 +198,7 @@ def show_player_for_saved_steep(steep_id):
   else:
     src_id = get_track(int(minutes), genre)
 
-  flash(f'You chose a ~{minutes} long {genre} song. Press play! Your tea will be ready when the song is over.', 'info')
+  flash(f'You chose a ~{minutes} minute long {genre} song. Press play! Your tea will be ready when the song is over.', 'info')
   return render_template('player2.html', src_id=src_id, genre=genre, minutes=minutes)
 
 @app.route('/savesteep', methods=['GET', 'POST'])
