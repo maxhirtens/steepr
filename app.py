@@ -27,6 +27,8 @@ CURR_USER_KEY = "curr_user"
 
 connect_db(app)
 
+load_dotenv()
+
 # *********Global Functions**********
 
 # Using Spotipy for Auth help
