@@ -10,6 +10,8 @@ processes = []
 
 [env]
   PORT = "8080"
+  SPOTIPY_CLIENT_ID='0ed4ef8563f940c6a616a0ea0c5b4623'
+  SPOTIPY_CLIENT_SECRET='88c84aecae954827b84e700ff2409132'
 
 [experimental]
   allowed_public_ports = []
