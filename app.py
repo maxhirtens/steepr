@@ -26,7 +26,7 @@ debug = DebugToolbarExtension(app)
 CURR_USER_KEY = "curr_user"
 
 connect_db(app)
-
+db.create_all()
 load_dotenv()
 
 # *********Global Functions**********
