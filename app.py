@@ -110,7 +110,6 @@ def sign_user_up():
 
   form = UserAddForm()
 
-
   if form.validate_on_submit():
     try:
       user = User.signup(
