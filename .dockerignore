@@ -1,8 +1,0 @@
-# flyctl launch added from .gitignore
-**/.DS_Store
-**/venv
-**/venv/lib
-**/status_codes.py
-**/__pycache__
-**/**/.vscode
-**/.env
