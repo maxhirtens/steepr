@@ -6,6 +6,8 @@ from forms import UserAddForm, LoginForm, SteepAddForm
 from spotipy.oauth2 import SpotifyClientCredentials
 from models import db, connect_db, User, Steep
 import spotipy
+import logging
+from pprint import pprint
 from dotenv import load_dotenv
 import os
 
@@ -22,6 +24,8 @@ except:
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["WTF_CSRF_ENABLED"] = True
 debug = DebugToolbarExtension(app)
+log = logging.getLogger("werkzeug")
+log.setLevel(logging.ERROR)
 
 CURR_USER_KEY = "curr_user"
 
@@ -127,6 +131,7 @@ def sign_user_up():
     if form.validate_on_submit():
         try:
             user = User.signup(username=form.username.data, password=form.password.data)
+            pprint(user)
             db.session.commit()
 
         except IntegrityError:
@@ -145,10 +150,11 @@ def sign_user_up():
 def log_user_in():
     """Authenticate and log in user."""
     form = LoginForm()
+    # check this line
 
     if form.validate_on_submit():
         user = User.authenticate(form.username.data, form.password.data)
-
+        pprint(user)
         if user:
             do_login(user)
             flash(f"Hello, {user.username}!", "success")
@@ -156,7 +162,8 @@ def log_user_in():
 
         flash("Wrong username/password.", "danger")
 
-    return render_template("login.html", form=form)
+    else:
+        return render_template("login.html", form=form)
 
 
 @app.route("/logout")
