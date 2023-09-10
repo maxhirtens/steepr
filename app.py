@@ -153,6 +153,7 @@ def log_user_in():
     # check this line
 
     if form.validate_on_submit():
+        pprint("form validated")
         user = User.authenticate(form.username.data, form.password.data)
         pprint(user)
         if user:
@@ -163,6 +164,7 @@ def log_user_in():
         flash("Wrong username/password.", "danger")
 
     else:
+        pprint("form not validated")
         return render_template("login.html", form=form)
 
 
