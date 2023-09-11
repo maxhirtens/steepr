@@ -42,5 +42,17 @@
         </div>
       </div>
     </div>
+    <script>
+      // check for mobile users - unsupported right now
+      let hasTouchScreen = false;
+      if ("maxTouchPoints" in navigator) {
+        hasTouchScreen = navigator.maxTouchPoints > 0;
+      }
+
+      if (hasTouchScreen) {
+        const body = document.querySelector("body");
+        body.innerHTML = "Sorry, Steepr is for desktop users only.";
+      }
+    </script>
   </body>
 </html>
