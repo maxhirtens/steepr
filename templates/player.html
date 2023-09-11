@@ -4,6 +4,7 @@
     <button formaction="/" class="btn btn-success">Start a New Steep</button>
   </form>
   <br />
+  <div class="wrap">
   <iframe
     style="border-radius: 12px"
     src="https://open.spotify.com/embed/track/{{src_id}}?utm_source=generator"
@@ -14,6 +15,7 @@
     allow="encrypted-media"
     loading="lazy"
   ></iframe>
+  </div>
   <br />
   <br />
   {% if g.user %}

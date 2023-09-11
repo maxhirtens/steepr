@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, flash, jsonify, session, g
+from flask import Flask, request, render_template, redirect, flash, session, g
 from random import randint, choice
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
@@ -6,7 +6,6 @@ from forms import UserAddForm, LoginForm, SteepAddForm
 from spotipy.oauth2 import SpotifyClientCredentials
 from models import db, connect_db, User, Steep
 import spotipy
-import logging
 from pprint import pprint
 from dotenv import load_dotenv
 import os
@@ -24,8 +23,6 @@ except:
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["WTF_CSRF_ENABLED"] = True
 debug = DebugToolbarExtension(app)
-log = logging.getLogger("werkzeug")
-log.setLevel(logging.ERROR)
 
 CURR_USER_KEY = "curr_user"
 
@@ -34,11 +31,7 @@ db.create_all()
 load_dotenv()
 
 # *********Global Functions**********
-
-# Currently this line only works for my local machine
-# sp = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials())
-
-# Attempting new auth type
+# Fixed auth type
 auth_manager = SpotifyClientCredentials()
 sp = spotipy.Spotify(auth_manager=auth_manager)
 
@@ -183,7 +176,7 @@ def log_user_out():
 @app.route("/", methods=["GET"])
 def homepage():
     """Show track search form."""
-
+    print(request.headers.get("User-Agent"))
     steeps = Steep.query.order_by(Steep.steep_id.desc()).limit(5)
 
     return render_template("homepage.html", steeps=steeps)
