@@ -4,7 +4,7 @@ Steepr is:
 
 - A companion app for Spotify users.
 - A music-based countdown timer for steeping tea.
-- Available at www.steepr.onrender.com
+- Available at https://www.steepr.onrender.com
 
 ![The homepage](/static/images/Homepage.png)
 
